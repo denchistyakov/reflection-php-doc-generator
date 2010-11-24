@@ -1,7 +1,10 @@
 PHP 5 class for generation php-doc's from reflection of user and internal classes.
 
-Example:
+Required:
+PHP 5.2 and Zend Framework 1.9 or letter.
 
+Example:
+<code>
 // Class initialization
 $generator = new App_PhpDoc_Generator_Class('Zend_Db_Table_Abstract');
 
@@ -11,3 +14,4 @@ $generator->setPropertiesFilter(ReflectionProperty::IS_PUBLIC)
 		  
 // print php-doc
 echo $generator->generate();
+</code>
