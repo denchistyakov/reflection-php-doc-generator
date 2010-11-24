@@ -1,4 +1,4 @@
-PHP 5 class for generation php-doc's from reflection of users and internals classes.
+PHP 5 class for generation php-doc`s from reflection of users and internals classes.
 
 Required:
 PHP 5.2 and Zend Framework 1.9 or letter. Namespace «App_» must be appended to autoladed namespases:
@@ -22,3 +22,5 @@ $generator->setPropertiesFilter(ReflectionProperty::IS_PUBLIC)
 
 // get generated php-doc as string and print
 echo $generator->generate();
+
+in plans add file generator with multi classes support
