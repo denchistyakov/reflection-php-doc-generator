@@ -1,17 +1,24 @@
-PHP 5 class for generation php-doc's from reflection of user and internal classes.
+PHP 5 class for generation php-doc's from reflection of users and internals classes.
 
 Required:
-PHP 5.2 and Zend Framework 1.9 or letter.
+PHP 5.2 and Zend Framework 1.9 or letter. Namespace «App_» must be appended to autoladed namespases:
+in application.ini:
+autoloadernamespaces.app = "App_"
+
+or
+
+in index.php or Bootstrap::_initAutoLoader():
+$autoloader = Zend_Loader_Autoloader::getInstance();
+$autoloader->registerNamespace('App_');
 
 Example:
-<code>
-// Class initialization
-$generator = new App_PhpDoc_Generator_Class('Zend_Db_Table_Abstract');
+// Class initialization for generating php-doc for Imagick class
+$generator = new App_PhpDoc_Generator_Class('Imagick');
 
 // Set filters for properties and methods visibility
+// show only public properties and public and protected methods
 $generator->setPropertiesFilter(ReflectionProperty::IS_PUBLIC)
           ->setMethodsFilter(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
-		  
-// print php-doc
+
+// get generated php-doc as string and print
 echo $generator->generate();
-</code>
