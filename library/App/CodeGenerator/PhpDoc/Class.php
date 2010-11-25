@@ -5,35 +5,22 @@
  *
  * @author Denis Chistyakov <den.chistyakov@gmail.com>
  */
-class App_PhpDoc_Generator_Class
+class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
 {
-    /**
-     * Имя класса на основании которго генерируется док
-     *
-     * @var string
-     */
-    private $_className;
-
-    /**
-     * Объект кода генератора для класса
-     *
-     * @var Zend_CodeGenerator_Php_Class
-     */
-    private $_class;
 
     /**
      * Рефлексия от указанного класса
      *
      * @var ReflectionClass
      */
-    private $_reflection;
+    protected $_reflection;
 
     /**
      * Массив свойств, аттрибутов и констант класса
      *
      * @var array
+    protected $_properties = array();
      */
-    private $_properties = array();
 
     /**
      * Фильтр свойств для дока
@@ -41,14 +28,14 @@ class App_PhpDoc_Generator_Class
      *
      * @var int
      */
-    private $_propertiesFilter = ReflectionProperty::IS_PUBLIC;
+    protected $_propertiesFilter = ReflectionProperty::IS_PUBLIC;
 
     /**
      * Массив методов класса
      *
      * @var array
+    protected $_methods = array();
      */
-    private $_methods = array();
 
     /**
      * Фильтр методов для дока
@@ -56,16 +43,12 @@ class App_PhpDoc_Generator_Class
      *
      * @var int
      */
-    private $_methodsFilter = ReflectionProperty::IS_PUBLIC;
+    protected $_methodsFilter = ReflectionProperty::IS_PUBLIC;
 
     public function __construct($className)
     {
-        $this->_className = $className;
-
-        $this->_class = new Zend_CodeGenerator_Php_Class();
-        $this->_class->setName($this->_className);
-
-        $this->_reflection = new ReflectionClass($this->_className);
+        $this->setName($className);
+        $this->_reflection = new ReflectionClass($className);
     }
 
     /**
@@ -105,43 +88,43 @@ class App_PhpDoc_Generator_Class
              ->_interfaces()
              ->_constants()
              ->_properties()
+             ->_setProperties()
              ->_methods()
-             ->_setProperties();
-
-        return $this->_class->generate();
+             ;
+//        return parent::generate();
     }
 
-    private function _docBlock()
+    protected function _docBlock()
     {
         // Данные о комментариях к классу
         if (null !== ($docBlock = $this->_getDocComment($this->_reflection))) {
-            $this->_class->setDocblock($docBlock);
+            $this->setDocblock($docBlock);
         }
         return $this;
     }
 
-    private function _abstract()
+    protected function _abstract()
     {
-        $this->_class->setAbstract($this->_reflection->isAbstract());
+        $this->setAbstract($this->_reflection->isAbstract());
         return $this;
     }
 
-    private function _parent()
+    protected function _parent()
     {
         $parentClass = $this->_reflection->getParentClass();
         if ($parentClass instanceof ReflectionClass) {
-            $this->_class->setExtendedClass($parentClass->getName());
+            $this->setExtendedClass($parentClass->getName());
         }
         return $this;
     }
 
-    private function _interfaces()
+    protected function _interfaces()
     {
-        $this->_class->setImplementedInterfaces($this->_reflection->getInterfaceNames());
+        $this->setImplementedInterfaces($this->_reflection->getInterfaceNames());
         return $this;
     }
 
-    private function _constants()
+    protected function _constants()
     {
         $consts = $this->_reflection->getConstants();
         foreach ($consts as $name => $defaultValue) {
@@ -154,26 +137,17 @@ class App_PhpDoc_Generator_Class
         return $this;
     }
 
-    private function _properties()
+    protected function _properties()
     {
         $properties = $this->_reflection->getProperties($this->_propertiesFilter);
 
         foreach ($properties as $property) {
             /* @var $property ReflectionProperty */
 
-            // Определяем видимость свойства
-            if ($property->isPrivate()) {
-                $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PRIVATE;
-            } else if ($property->isProtected()) {
-                $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PROTECTED;
-            } else if ($property->isPublic()) {
-                $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PUBLIC;
-            }
-
             // Массив с обязательными параметрами свойства
             $data = array(
                 'name'         => $property->getName(),
-                'visibility'   => $visibility,
+                'visibility'   => $this->_getVisibility($property),
                 'static'       => $property->isStatic(),
             );
 
@@ -192,32 +166,23 @@ class App_PhpDoc_Generator_Class
         return $this;
     }
 
-    private function _setProperties()
+    protected function _setProperties()
     {
-        $this->_class->setProperties($this->_properties);
+        $this->setProperties($this->_properties);
         return $this;
     }
 
-    private function _methods()
+    protected function _methods()
     {
         $methods = $this->_reflection->getMethods($this->_methodsFilter);
 
         foreach ($methods as $method) {
             /* @var $method ReflectionMethod */
 
-            // Определяем видимость свойства
-            if ($method->isPrivate()) {
-                $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PRIVATE;
-            } else if ($method->isProtected()) {
-                $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PROTECTED;
-            } else if ($method->isPublic()) {
-                $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PUBLIC;
-            }
-
             // Массив с обязательными параметрами свойства
             $data = array(
                 'name'         => $method->getName(),
-                'visibility'   => $visibility,
+                'visibility'   => $this->_getVisibility($method),
                 'static'       => $method->isStatic(),
                 'abstract'     => $method->isAbstract(),
                 'closure'      => $method->isClosure(),
@@ -249,7 +214,7 @@ class App_PhpDoc_Generator_Class
 
             $this->_methods[] = $data;
         }
-        $this->_class->setMethods($this->_methods);
+        $this->setMethods($this->_methods);
         return $this;
     }
 
@@ -259,7 +224,7 @@ class App_PhpDoc_Generator_Class
      * @param mixed $reflection
      * @return string|null
      */
-    private function _getDocComment($reflection)
+    protected function _getDocComment($reflection)
     {
         $docComment = $reflection->getDocComment();
         if (!empty($docComment)) {
@@ -272,5 +237,23 @@ class App_PhpDoc_Generator_Class
         }
         return null;
     }
-}
 
+    /**
+     * Определяем видимость рефлексии метода или свойства
+     *
+     * @param mixed $reflection
+     * @return string
+     */
+    protected function _getVisibility($reflection)
+    {
+        if ($reflection->isPrivate()) {
+            $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PRIVATE;
+        } else if ($reflection->isProtected()) {
+            $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PROTECTED;
+        } else if ($reflection->isPublic()) {
+            $visibility = Zend_CodeGenerator_Php_Member_Abstract::VISIBILITY_PUBLIC;
+        }
+        return $visibility;
+    }
+
+}
