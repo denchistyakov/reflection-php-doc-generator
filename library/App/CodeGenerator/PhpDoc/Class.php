@@ -19,8 +19,8 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
      * Массив свойств, аттрибутов и констант класса
      *
      * @var array
-    protected $_properties = array();
      */
+    protected $_propertiesList = array();
 
     /**
      * Фильтр свойств для дока
@@ -34,8 +34,8 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
      * Массив методов класса
      *
      * @var array
-    protected $_methods = array();
      */
+    protected $_methodsList = array();
 
     /**
      * Фильтр методов для дока
@@ -88,10 +88,9 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
              ->_interfaces()
              ->_constants()
              ->_properties()
-             ->_setProperties()
-             ->_methods()
-             ;
-//        return parent::generate();
+             ->_constantssetAndProperties()
+             ->_methods();
+        return parent::generate();
     }
 
     protected function _docBlock()
@@ -128,7 +127,7 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
     {
         $consts = $this->_reflection->getConstants();
         foreach ($consts as $name => $defaultValue) {
-            $this->_properties[] = array(
+            $this->_propertiesList[] = array(
                 'name'         => $name,
                 'const'        => true,
                 'defaultValue' => $defaultValue,
@@ -161,14 +160,14 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
             if (null !== ($docBlock = $this->_getDocComment($property))) {
                 $data['docBlock'] = $docBlock;
             }
-            $this->_properties[] = $data;
+            $this->_propertiesList[] = $data;
         }
         return $this;
     }
 
-    protected function _setProperties()
+    protected function _constantssetAndProperties()
     {
-        $this->setProperties($this->_properties);
+        $this->setProperties($this->_propertiesList);
         return $this;
     }
 
@@ -212,9 +211,9 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
             }
             $data['parameters'] = $parametersData;
 
-            $this->_methods[] = $data;
+            $this->_methodsList[] = $data;
         }
-        $this->setMethods($this->_methods);
+        $this->setMethods($this->_methodsList);
         return $this;
     }
 
