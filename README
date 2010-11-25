@@ -13,7 +13,7 @@ $autoloader->registerNamespace('App_');
 
 Example:
 // Class initialization for generating php-doc for Imagick class
-$generator = new App_PhpDoc_Generator_Class('Imagick');
+$generator = new App_CodeGenerator_PhpDoc_Class('Imagick');
 
 // Set filters for properties and methods visibility
 // show only public properties and public and protected methods
@@ -23,4 +23,4 @@ $generator->setPropertiesFilter(ReflectionProperty::IS_PUBLIC)
 // get generated php-doc as string and print
 echo $generator->generate();
 
-in plans add file generator with multi classes support
+in plans unit tests
