@@ -13,21 +13,21 @@ class App_CodeGenerator_PhpDoc_File extends Zend_CodeGenerator_Php_File
      *
      * @var array
      */
-    private $_classes = array();
+    protected $_classes = array();
 
     /**
      * Список классов для генерации
      *
      * @var array
      */
-    private $_classNames = array();
+    protected $_classNames = array();
 
     /**
      * Имя файла для дока
      *
      * @var string
      */
-    private $_filename;
+    protected $_filename;
 
     public function __construct(array $options = array())
     {
@@ -74,11 +74,12 @@ class App_CodeGenerator_PhpDoc_File extends Zend_CodeGenerator_Php_File
             throw new App_CodeGenerator_PhpDoc_Exception('Classes list is empty');
         }
 
+        $classes = array();
         foreach ($this->_classNames as $class) {
-            $this->_classes[] = new App_CodeGenerator_PhpDoc_Class($class);
+            $classes[] = new App_CodeGenerator_PhpDoc_Class($class);
         }
 
-        $this->setClasses($this->_classes);
+        $this->setClasses($classes);
         return parent::generate();
     }
 

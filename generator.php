@@ -15,6 +15,8 @@ require_once 'Zend/Loader/Autoloader.php';
 $autoloader = Zend_Loader_Autoloader::getInstance();
 $autoloader->registerNamespace('App_');
 
-$generator = new App_CodeGenerator_PhpDoc_Class('Zend_Application_Bootstrap_Bootstrap');
-$generator->setPropertiesFilter(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
-echo $generator->generate();
+$generator = new App_CodeGenerator_PhpDoc_File(array(
+    'classes'  => array('Zend_Application_Bootstrap_Bootstrap', 'Zend_Application_Module_Autoloader'),
+    'filename' => 'Zend_Application',
+));
+echo $generator->write();

@@ -45,6 +45,16 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
      */
     protected $_methodsFilter = ReflectionProperty::IS_PUBLIC;
 
+    /**
+     * @var array Array of properties
+     */
+    protected $_properties = array();
+
+    /**
+     * @var array Array of methods
+     */
+    protected $_methods = array();
+
     public function __construct($className)
     {
         $this->setName($className);
@@ -88,7 +98,7 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
              ->_interfaces()
              ->_constants()
              ->_properties()
-             ->_constantssetAndProperties()
+             ->_constantsAndProperties()
              ->_methods();
         return parent::generate();
     }
@@ -165,7 +175,7 @@ class App_CodeGenerator_PhpDoc_Class extends Zend_CodeGenerator_Php_Class
         return $this;
     }
 
-    protected function _constantssetAndProperties()
+    protected function _constantsAndProperties()
     {
         $this->setProperties($this->_propertiesList);
         return $this;
