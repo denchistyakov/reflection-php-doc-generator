@@ -19,4 +19,4 @@ $generator = new App_CodeGenerator_PhpDoc_File(array(
     'classes'  => array('Zend_Application_Bootstrap_Bootstrap', 'Zend_Application_Module_Autoloader'),
     'filename' => 'Zend_Application',
 ));
-echo $generator->write();
+$generator->write();
